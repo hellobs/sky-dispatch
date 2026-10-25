@@ -126,11 +126,11 @@
     buildCard(r, game) {
       const st = SD.TYPE_STYLE[r.type];
       const card = document.createElement('div');
-      card.className = 'req-card ' + r.type + (r.risky ? ' risky' : '');
+      card.className = 'req-card ' + r.type;
       card.__req = r;
       card.innerHTML = `
         <div class="req-top">
-          <span class="req-badge" style="color:${st.color};border-color:${st.color}">${st.label}${r.type === 'rescue' ? ' ⚡' : ''}${r.risky ? ' ⚠' : ''}</span>
+          <span class="req-badge" style="color:${st.color};border-color:${st.color}">${st.label}${r.type === 'rescue' ? ' ⚡' : ''}</span>
           <span class="req-reward">+${r.reward}</span>
         </div>
         <div class="req-route">P${C.PADS.indexOf(r.origin) + 1} · (${r.origin.x},${r.origin.y}) → (${r.dest.x},${r.dest.y})</div>

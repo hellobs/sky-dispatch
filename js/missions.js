@@ -20,18 +20,7 @@
       this.id = SD.uid();
       this.type = pickType();
       this.origin = SD.choice(C.PADS);
-      // 目的地优先选不在固定禁航航线上的；多次尝试后仍穿航则保留并标记
-      let dest = null, risky = false;
-      for (let t = 0; t < 5; t++) {
-        dest = airspace.randomFreeCell(this.origin, 8);
-        risky = airspace.pathHitsStatic(
-          this.origin.x + 0.5, this.origin.y + 0.5,
-          dest.x + 0.5, dest.y + 0.5,
-        );
-        if (!risky) break;
-      }
-      this.dest = dest;
-      this.risky = risky;
+      this.dest = airspace.randomFreeCell(this.origin, 8);
       // 有效期随对局推进缩短；救援窗口更短，逼你排优先级
       const t = SD.clamp((elapsed || 0) / C.ROUND_SECONDS, 0, 1);
       const baseTtl = SD.lerp(C.REQUEST_TTL, C.TTL_END, Math.pow(t, C.SPAWN_CURVE));

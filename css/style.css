@@ -103,9 +103,6 @@ canvas#sky { display: block; border-radius: 6px; }
 .req-card.delivery { border-left-color: var(--accent); }
 .req-card.inspection { border-left-color: var(--warn); }
 .req-card.rescue { border-left-color: var(--rescue); }
-.req-card.risky { border-left-color: var(--danger); }
-.req-card.risky .req-route { color: var(--danger); }
-.req-card.risky .req-reward { color: var(--warn); }
 
 .req-top { display: flex; justify-content: space-between; align-items: center; }
 .req-badge { font-size: 11px; border: 1px solid; padding: 1px 8px; border-radius: 20px; font-weight: 600; }

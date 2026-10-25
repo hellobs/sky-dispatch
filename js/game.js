@@ -329,36 +329,14 @@
       const r = this.preview;
       const ox = (r.origin.x + 0.5) * C.CELL, oy = (r.origin.y + 0.5) * C.CELL;
       const dx = (r.dest.x + 0.5) * C.CELL, dy = (r.dest.y + 0.5) * C.CELL;
-      // 风险预告：固定禁航（不可批准）红、动态威胁（风暴/临时管制）黄
-      const hitsStatic = this.airspace.pathHitsStatic(ox / C.CELL, oy / C.CELL, dx / C.CELL, dy / C.CELL);
-      let hitsDynamic = false;
-      if (!hitsStatic) {
-        for (const w of this.airspace.weather) {
-          if (this.airspace.pathHitsCircle(ox / C.CELL, oy / C.CELL, dx / C.CELL, dy / C.CELL, w.x, w.y, w.r)) { hitsDynamic = true; break; }
-        }
-        if (!hitsDynamic) {
-          for (const z of this.airspace.tempZones) {
-            if (this.airspace.pathHitsCircle(ox / C.CELL, oy / C.CELL, dx / C.CELL, dy / C.CELL, z.x, z.y, z.r)) { hitsDynamic = true; break; }
-          }
-        }
-      }
-      const col = hitsStatic ? '#ff5470' : hitsDynamic ? '#ffb545' : SD.TYPE_STYLE[r.type].color;
-      const label = hitsStatic ? '⚠ 穿越禁飞区' : hitsDynamic ? '⚠ 有风险' : '';
       ctx.save();
       ctx.setLineDash([6, 5]);
-      ctx.strokeStyle = col;
-      ctx.globalAlpha = 0.8;
+      ctx.strokeStyle = SD.TYPE_STYLE[r.type].color;
+      ctx.globalAlpha = 0.75;
       ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(dx, dy); ctx.stroke();
       ctx.beginPath(); ctx.arc(ox, oy, 9, 0, Math.PI * 2); ctx.stroke();
       ctx.beginPath(); ctx.arc(dx, dy, 7, 0, Math.PI * 2); ctx.stroke();
-      if (label) {
-        ctx.setLineDash([]);
-        ctx.fillStyle = col;
-        ctx.font = 'bold 11px Consolas, monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText(label, (ox + dx) / 2, (oy + dy) / 2 - 6);
-      }
       ctx.restore();
     }
   }
