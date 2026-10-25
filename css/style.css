@@ -247,6 +247,11 @@ canvas#sky { display: block; border-radius: 6px; width: 704px; height: 704px; ma
   font-size: 12.5px;
   letter-spacing: 0.5px;
 }
+#btn-giveup { margin-top: 10px; width: 100%; }
+
+/* 最后 10 秒倒计时紧迫感 */
+.hud-val.urgent { color: var(--danger); animation: urgent-pulse 1s infinite; }
+@keyframes urgent-pulse { 50% { opacity: 0.45; } }
 
 /* ---------- 触屏输入细节 ---------- */
 .btn,

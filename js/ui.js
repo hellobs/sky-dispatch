@@ -26,6 +26,7 @@
     }
     setHud(s) {
       this.el.time.textContent = s.time;
+      this.el.time.classList.toggle('urgent', s.urgent);
       this.el.score.textContent = s.score;
       this.el.combo.textContent = s.combo;
       this.el.combo.classList.toggle('hot', s.comboHot);

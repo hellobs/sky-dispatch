@@ -47,6 +47,10 @@
     game.togglePause();
     e.currentTarget.blur();
   });
+  document.getElementById('btn-giveup').addEventListener('click', (e) => {
+    game.start();
+    e.currentTarget.blur();
+  });
   document.getElementById('btn-pause').addEventListener('click', (e) => {
     game.togglePause();
     e.currentTarget.blur();
@@ -86,6 +90,17 @@
       if (game.state === 'running' || game.state === 'paused') game.togglePause();
     } else if (e.code === 'Enter') {
       if (game.state === 'menu' || game.state === 'over') game.start();
+    } else if (game.state === 'running' && game.board) {
+      // 键盘速操：数字键批准第 N 个申请，QWERTY 拒绝
+      const APPROVE = ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6'];
+      const DENY = ['KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY'];
+      let idx = APPROVE.indexOf(e.code);
+      const isDeny = idx < 0 ? (idx = DENY.indexOf(e.code)) >= 0 : false;
+      if (idx >= 0 && game.board.requests[idx]) {
+        e.preventDefault();
+        if (isDeny) game.rejectRequest(game.board.requests[idx].id);
+        else game.approveRequest(game.board.requests[idx].id);
+      }
     }
   });
 

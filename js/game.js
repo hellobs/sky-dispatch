@@ -163,7 +163,7 @@
         this.combo = 0;
         this.multLevel = 1;
         this.score -= expired * C.PENALTY.expire;
-        this.addFloat(C.GRID / 2, 2.5, `-${expired * C.PENALTY.expire} 逾期`, '#ffb545');
+        this.addFloat(C.GRID / 2, 4, `-${expired * C.PENALTY.expire} 逾期`, '#ffb545');
         SD.audio.expire();
       }
 
@@ -338,6 +338,7 @@
       const mult = this.mult();
       this.ui.setHud({
         time: SD.fmtTime(C.ROUND_SECONDS - this.elapsed),
+        urgent: this.state === 'running' && C.ROUND_SECONDS - this.elapsed <= 10,
         score: this.score,
         combo: this.combo > 0 ? `×${mult} · ${this.combo}` : '—',
         comboHot: mult > 1,
