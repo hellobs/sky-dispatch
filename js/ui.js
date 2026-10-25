@@ -144,6 +144,12 @@
       card.querySelector('.deny').addEventListener('click', () => game.rejectRequest(r.id));
       card.addEventListener('mouseenter', () => { if (game.state === 'running') game.preview = r; });
       card.addEventListener('mouseleave', () => { if (game.preview === r) game.preview = null; });
+      // 触屏没有 hover：点卡片本身切换航线预览（点按钮除外）
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('button')) return;
+        if (game.state !== 'running') return;
+        game.preview = game.preview === r ? null : r;
+      });
       this.el.queue.appendChild(card);
       return card;
     }

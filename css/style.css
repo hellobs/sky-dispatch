@@ -54,7 +54,7 @@ main { display: flex; gap: 12px; align-items: stretch; }
   border-radius: 0 0 10px 10px;
   padding: 10px;
 }
-canvas#sky { display: block; border-radius: 6px; }
+canvas#sky { display: block; border-radius: 6px; width: 704px; height: 704px; max-width: 100%; }
 
 #panel {
   width: 252px;
@@ -234,3 +234,39 @@ canvas#sky { display: block; border-radius: 6px; }
   margin-bottom: 6px;
 }
 .shutdown-line.hidden { display: none; }
+
+/* ---------- 移动端（窄屏竖排布局） ---------- */
+@media (max-width: 1020px) {
+  body { padding: 8px; }
+  #app { width: 100%; }
+  #topbar { flex-wrap: wrap; gap: 10px; padding: 8px 10px; border-radius: 10px; }
+  .brand { font-size: 16px; }
+  #hud { gap: 8px; margin-left: 0; width: 100%; justify-content: space-between; }
+  .hud-item { min-width: 42px; }
+  .hud-label { font-size: 10px; }
+  .hud-val { font-size: 15px; }
+  main { flex-direction: column; }
+  #stage { border-radius: 10px; padding: 6px; }
+  .overlay { inset: 6px; }
+  canvas#sky { width: 100%; height: auto; aspect-ratio: 1; }
+  #panel { width: 100%; gap: 8px; }
+  /* 申请队列横向滑动，卡片够大好点按 */
+  #queue {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px 2px 6px;
+  }
+  #queue::-webkit-scrollbar { height: 5px; }
+  .req-card { min-width: 200px; flex-shrink: 0; }
+  .btn { padding: 9px 14px; }
+  .btn.small { padding: 10px 0; }
+  /* 地图上已有全部标注，小屏收起图例 */
+  #legend { display: none; }
+  .overlay-card { margin: 0 8px; padding: 22px 16px; max-width: none; }
+  .overlay-card h1 { font-size: 26px; }
+  .cn-title { font-size: 16px; letter-spacing: 5px; }
+  .desc { font-size: 12px; line-height: 1.8; }
+  .report-score { font-size: 40px; }
+  .report-rows { font-size: 12.5px; gap: 5px 18px; }
+}
