@@ -234,6 +234,29 @@ canvas#sky { display: block; border-radius: 6px; width: 704px; height: 704px; ma
   margin-bottom: 6px;
 }
 .shutdown-line.hidden { display: none; }
+.record-line {
+  color: var(--warn);
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.record-line.hidden { display: none; }
+.best-line {
+  margin-top: 10px;
+  color: var(--warn);
+  font-size: 12.5px;
+  letter-spacing: 0.5px;
+}
+
+/* ---------- 触屏输入细节 ---------- */
+.btn,
+.req-card,
+canvas#sky {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+#queue { overscroll-behavior: contain; }
 
 /* ---------- 移动端（窄屏竖排布局） ---------- */
 @media (max-width: 1020px) {

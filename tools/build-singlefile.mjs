@@ -13,18 +13,18 @@ const scripts = ["utils", "config", "airspace", "drone", "missions", "ui", "audi
 
 // 用替换函数返回，避免 JS 源码中的 $ 序列被当作替换模式
 let out = html.replace(
-  '<link rel="stylesheet" href="css/style.css">',
+  /<link rel="stylesheet" href="css\/style\.css(\?v=\d+)?">/,
   () => "<style>\n" + css + "\n</style>",
 );
 
 for (const name of scripts) {
   const js = await readFile(join(root, "js", name + ".js"), "utf8");
-  const tag = '<script src="js/' + name + '.js"></script>';
-  if (!out.includes(tag)) throw new Error("index.html 中找不到 " + tag);
+  const tag = new RegExp('<script src="js/' + name + '\\.js(\\?v=\\d+)?"></script>');
+  if (!tag.test(out)) throw new Error("index.html 中找不到 " + name + " 的 script 标签");
   out = out.replace(tag, () => "<script>\n" + js + "\n</script>");
 }
 
-if (/src="js\/|css\/style\.css"/.test(out)) throw new Error("仍有未内联的外部引用");
+if (/src="js\/|css\/style\.css/.test(out)) throw new Error("仍有未内联的外部引用");
 
 await mkdir(join(root, "dist"), { recursive: true });
 const target = join(root, "dist", "index.html");

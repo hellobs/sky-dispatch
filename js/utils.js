@@ -15,4 +15,14 @@
     s = Math.max(0, Math.ceil(s));
     return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
   };
+
+  /* 本地最佳纪录（隐私模式下静默降级） */
+  SD.best = {
+    get() {
+      try { return +localStorage.getItem('sd-best') || 0; } catch (e) { return 0; }
+    },
+    set(v) {
+      try { localStorage.setItem('sd-best', String(v)); } catch (e) { /* 忽略 */ }
+    },
+  };
 })();

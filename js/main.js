@@ -32,6 +32,9 @@
   syncViewScale();
   window.addEventListener('resize', syncViewScale);
 
+  // 主菜单展示历史最佳
+  ui.updateBest(SD.best.get());
+
   document.getElementById('btn-start').addEventListener('click', (e) => {
     game.start();
     e.currentTarget.blur();

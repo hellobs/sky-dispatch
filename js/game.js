@@ -53,6 +53,7 @@
       this.elapsed = 0;
       this.uiTimer = 0;
       this.lastTickSec = null;
+      this.lastTs = null; // 防止重开首帧吃进菜单期的巨长 dt
       this.state = 'running';
       this.ui.hideOverlays();
       this.ui.setPauseEnabled(true);
@@ -313,6 +314,8 @@
         comboBest: this.comboBest,
         livesLeft: Math.max(0, this.lives),
         shutdown: this.shutdown,
+        newRecord: this.newRecord,
+        prevBest: this.prevBest,
       };
     }
 
@@ -322,7 +325,12 @@
       this.ui.syncQueue(this.board, this);
       this.ui.setPauseEnabled(false);
       this.updateHud();
+      const prev = SD.best.get();
+      this.prevBest = prev;
+      this.newRecord = this.score > prev && this.score > 0;
+      if (this.newRecord) SD.best.set(this.score);
       this.ui.showReport(this.stats());
+      this.ui.updateBest(SD.best.get());
       SD.audio.over(this.shutdown);
     }
 

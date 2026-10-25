@@ -114,16 +114,6 @@
       }
       return { x: SD.randInt(2, C.GRID - 3), y: SD.randInt(2, C.GRID - 3) };
     }
-    /* 航线采样：是否穿越固定禁飞区（用于批准校验） */
-    pathHitsStatic(x1, y1, x2, y2) {
-      const N = 28;
-      for (let i = 0; i <= N; i++) {
-        const t = i / N;
-        const x = x1 + (x2 - x1) * t, y = y1 + (y2 - y1) * t;
-        if (C.NOFLY.some((z) => SD.dist(x, y, z.x, z.y) < z.r)) return true;
-      }
-      return false;
-    }
     /* 航线采样：是否穿过某个动态圆形区域（风暴/临时禁飞区） */
     pathHitsCircle(x1, y1, x2, y2, cx, cy, r) {
       const N = 28;

@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#070c16">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚁</text></svg>">
 <title>SkyDispatch · 低空塔台</title>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=5">
 </head>
 <body>
 <div id="app">
@@ -41,6 +43,7 @@
           </p>
           <button id="btn-start" class="btn primary">开始调度</button>
           <p class="hint">空格键暂停 · 悬停/点按申请卡预览航线 · 救援机 ⚡ 更快但窗口更短</p>
+          <p class="best-line" id="menu-best"></p>
         </div>
       </div>
 
@@ -55,6 +58,7 @@
         <div class="overlay-card">
           <h2 id="report-title">今日调度报告</h2>
           <div id="shutdown-line" class="shutdown-line hidden">⚠ 安全盾耗尽 · 塔台被提前关闭</div>
+          <div id="record-line" class="record-line hidden">🏆 新纪录！</div>
           <div class="report-score"><span id="report-score">0</span><span class="unit">分</span></div>
           <div id="report-rows" class="report-rows"></div>
           <div class="report-btns">
@@ -82,14 +86,14 @@
   </main>
 </div>
 
-<script src="js/utils.js"></script>
-<script src="js/config.js"></script>
-<script src="js/airspace.js"></script>
-<script src="js/drone.js"></script>
-<script src="js/missions.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/audio.js"></script>
-<script src="js/game.js"></script>
-<script src="js/main.js"></script>
+<script src="js/utils.js?v=5"></script>
+<script src="js/config.js?v=5"></script>
+<script src="js/airspace.js?v=5"></script>
+<script src="js/drone.js?v=5"></script>
+<script src="js/missions.js?v=5"></script>
+<script src="js/ui.js?v=5"></script>
+<script src="js/audio.js?v=5"></script>
+<script src="js/game.js?v=5"></script>
+<script src="js/main.js?v=5"></script>
 </body>
 </html>

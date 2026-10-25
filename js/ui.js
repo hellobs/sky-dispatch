@@ -16,6 +16,8 @@
         menu: $('overlay-menu'), pause: $('overlay-pause'), report: $('overlay-report'),
         reportScore: $('report-score'), reportRows: $('report-rows'),
         reportTitle: $('report-title'), shutdownLine: $('shutdown-line'),
+        recordLine: $('record-line'),
+        menuBest: $('menu-best'),
         pauseBtn: $('btn-pause'), ticker: $('ticker'),
       };
       this.cardMap = new Map(); // request.id → 卡片元素（常驻，不再整体重建）
@@ -42,6 +44,10 @@
       clearTimeout(this.toastTimer);
       this.toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
     }
+    /* 主菜单上的历史纪录 */
+    updateBest(n) {
+      this.el.menuBest.textContent = n > 0 ? `🏆 最佳纪录 ${n} 分` : '首局将创造你的纪录';
+    }
     setPauseEnabled(b) { this.el.pauseBtn.disabled = !b; }
     setPauseLabel(paused) { this.el.pauseBtn.textContent = paused ? '继续' : '暂停'; }
     hideOverlays() {
@@ -55,6 +61,7 @@
     showReport(st) {
       this.el.reportTitle.textContent = st.shutdown ? '塔台已关闭' : '今日调度报告';
       this.el.shutdownLine.classList.toggle('hidden', !st.shutdown);
+      this.el.recordLine.classList.toggle('hidden', !st.newRecord);
       this.el.reportScore.textContent = st.score;
       const rows = [
         ['完成架次', st.completed],
@@ -67,6 +74,7 @@
         ['风暴坠机', st.weatherCrashes],
         ['闯入禁飞', st.zoneViolations],
         ['剩余安全盾', '●'.repeat(st.livesLeft) + '○'.repeat(Math.max(0, C.LIVES - st.livesLeft))],
+        ['历史最佳', Math.max(st.prevBest, st.score)],
       ];
       this.el.reportRows.innerHTML = rows
         .map(([k, v]) => `<div class="rk">${k}</div><div class="rv">${v}</div>`)
