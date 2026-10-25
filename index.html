@@ -13,6 +13,8 @@
     <div id="hud">
       <div class="hud-item"><span class="hud-label">剩余</span><span class="hud-val" id="hud-time">03:00</span></div>
       <div class="hud-item"><span class="hud-label">得分</span><span class="hud-val accent" id="hud-score">0</span></div>
+      <div class="hud-item"><span class="hud-label">连击</span><span class="hud-val" id="hud-combo">—</span></div>
+      <div class="hud-item"><span class="hud-label">安全盾</span><span class="hud-val good" id="hud-lives">●●●</span></div>
       <div class="hud-item"><span class="hud-label">在空</span><span class="hud-val" id="hud-air">0</span></div>
       <div class="hud-item"><span class="hud-label">完成</span><span class="hud-val" id="hud-done">0</span></div>
       <div class="hud-item"><span class="hud-label">冲突</span><span class="hud-val danger" id="hud-crash">0</span></div>
@@ -23,6 +25,7 @@
   <main>
     <div id="stage">
       <canvas id="sky" width="704" height="704"></canvas>
+      <div id="ticker"></div>
 
       <div id="overlay-menu" class="overlay">
         <div class="overlay-card">
@@ -30,12 +33,13 @@
           <p class="cn-title">低空塔台</p>
           <p class="desc">
             1024 格低空空域正在向你开放。<br>
-            审批不断涌入的飞行申请、放行无人机、<br>
-            避开禁飞区与移动风暴——<br>
-            撑满一局 3 分钟，看看你能调度多少架次。
+            审批不断涌入的飞行申请，掌控放行节奏；<br>
+            避开禁飞区、移动风暴与临时空域管制。<br>
+            安全盾只有 3 个，任何事故都会扣一盾；<br>
+            连续送达可将收益叠到 ×3。
           </p>
           <button id="btn-start" class="btn primary">开始调度</button>
-          <p class="hint">空格键暂停 · 鼠标悬停申请卡可在地图上预览航线</p>
+          <p class="hint">空格键暂停 · 悬停申请卡预览航线 · 救援机 ⚡ 更快但窗口更短</p>
         </div>
       </div>
 
@@ -48,7 +52,8 @@
 
       <div id="overlay-report" class="overlay hidden">
         <div class="overlay-card">
-          <h2>今日调度报告</h2>
+          <h2 id="report-title">今日调度报告</h2>
+          <div id="shutdown-line" class="shutdown-line hidden">⚠ 安全盾耗尽 · 塔台被提前关闭</div>
           <div class="report-score"><span id="report-score">0</span><span class="unit">分</span></div>
           <div id="report-rows" class="report-rows"></div>
           <div class="report-btns">
@@ -66,9 +71,10 @@
         <div class="legend-title">图例</div>
         <div class="legend-row"><span class="dot d-delivery"></span>配送任务</div>
         <div class="legend-row"><span class="dot d-inspection"></span>巡检任务</div>
-        <div class="legend-row"><span class="dot d-rescue"></span>救援任务</div>
-        <div class="legend-row"><span class="shape pad"></span>起降点</div>
+        <div class="legend-row"><span class="dot d-rescue"></span>救援任务（快）</div>
+        <div class="legend-row"><span class="shape pad"></span>起降点 P1–P6</div>
         <div class="legend-row"><span class="shape zone"></span>禁飞区（闯入扣分）</div>
+        <div class="legend-row"><span class="shape temp"></span>临时禁飞区（预警后生效）</div>
         <div class="legend-row"><span class="shape storm"></span>风暴（进入坠机）</div>
       </div>
     </aside>

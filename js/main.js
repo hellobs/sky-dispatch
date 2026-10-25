@@ -3,6 +3,7 @@
   const canvas = document.getElementById('sky');
   const ui = new SD.UI();
   const game = new SD.Game(canvas, ui);
+  SD.ui = ui; // 调试探针
 
   // 高分屏适配
   const dpr = window.devicePixelRatio || 1;
@@ -32,7 +33,7 @@
 
   document.getElementById('btn-share').addEventListener('click', (e) => {
     const s = game.stats();
-    const text = `我在 #SkyDispatch 低空塔台 完成一局低空调度：总分 ${s.score}，完成 ${s.completed} 单，准点率 ${s.onTime}%，空中冲突 ${s.crashes} 次。1024 格低空空域，等你来接管塔台。`;
+    const text = `我在 #SkyDispatch 低空塔台 完成一局低空调度：总分 ${s.score}，完成 ${s.completed} 单，最高 ${s.comboBest} 连击，准点率 ${s.onTime}%。1024 格低空空域，等你来接管塔台。`;
     const btn = e.currentTarget;
     const done = () => {
       btn.textContent = '已复制 ✓';
@@ -78,9 +79,4 @@
   setInterval(() => {
     if (performance.now() - lastTick > 400) game.frame(performance.now());
   }, 250);
-
-  // 切出页面自动暂停，回来后手动继续
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden && game.state === 'running') game.togglePause();
-  });
 })();

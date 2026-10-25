@@ -21,12 +21,19 @@
       this.y = req.origin.y + 0.5;
       this.tx = req.dest.x + 0.5;
       this.ty = req.dest.y + 0.5;
-      this.speed = C.DRONE_SPEED;
+      this.speed = C.DRONE_SPEED * (req.type === 'rescue' ? C.RESCUE_SPEED_MULT : 1);
       this.heading = Math.atan2(this.ty - this.y, this.tx - this.x);
       this.alive = true;
       this.deathCause = null;
       this.deadTimer = 0;
+      this.diverting = false; // 空域管制备降中
       this.trail = [];
+    }
+    /* 空域管制：改飞最近的起降点备降 */
+    divert(tx, ty) {
+      this.tx = tx;
+      this.ty = ty;
+      this.diverting = true;
     }
     /* 返回 true 表示本次更新中落地 */
     update(dt) {
@@ -68,9 +75,10 @@
         ctx.restore();
         return;
       }
+      const col = this.diverting ? '#b8c9dc' : TYPE_STYLE[this.type].color;
       if (this.trail.length > 1) {
         ctx.save();
-        ctx.strokeStyle = TYPE_STYLE[this.type].color;
+        ctx.strokeStyle = col;
         ctx.globalAlpha = 0.25;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
@@ -84,7 +92,7 @@
       ctx.save();
       ctx.translate(this.x * C.CELL, this.y * C.CELL);
       ctx.rotate(this.heading);
-      ctx.fillStyle = TYPE_STYLE[this.type].color;
+      ctx.fillStyle = col;
       ctx.beginPath();
       ctx.moveTo(7, 0);
       ctx.lineTo(-5, 4.5);
@@ -92,6 +100,13 @@
       ctx.lineTo(-5, -4.5);
       ctx.closePath();
       ctx.fill();
+      if (this.diverting) {
+        ctx.strokeStyle = '#b8c9dc';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(0, 0, 10 + 3 * Math.sin(Date.now() / 150), 0, Math.PI * 2);
+        ctx.stroke();
+      }
       ctx.restore();
     }
   }

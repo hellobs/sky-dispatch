@@ -103,6 +103,9 @@ canvas#sky { display: block; border-radius: 6px; }
 .req-card.delivery { border-left-color: var(--accent); }
 .req-card.inspection { border-left-color: var(--warn); }
 .req-card.rescue { border-left-color: var(--rescue); }
+.req-card.blocked { border-left-color: var(--danger); opacity: 0.75; }
+.req-card.blocked .approve { opacity: 0.45; cursor: not-allowed; }
+.req-card.blocked .req-route { color: var(--danger); }
 
 .req-top { display: flex; justify-content: space-between; align-items: center; }
 .req-badge { font-size: 11px; border: 1px solid; padding: 1px 8px; border-radius: 20px; font-weight: 600; }
@@ -197,4 +200,40 @@ canvas#sky { display: block; border-radius: 6px; }
 .shape { width: 10px; height: 10px; display: inline-block; }
 .shape.pad { border: 1.5px solid rgba(220, 235, 255, 0.8); border-radius: 50%; }
 .shape.zone { border: 1px dashed var(--danger); }
+.shape.temp { border: 1px dashed var(--warn); border-radius: 50%; }
 .shape.storm { background: rgba(159, 179, 200, 0.45); border-radius: 50%; }
+
+/* ---------- 安全盾与连击 ---------- */
+.hud-val.good { color: var(--ok); }
+.hud-val.mid { color: var(--warn); }
+.hud-val.danger { color: var(--danger); }
+.hud-val.hot { color: var(--warn); text-shadow: 0 0 8px rgba(255, 181, 69, 0.5); }
+
+/* ---------- 事件播报条 ---------- */
+#ticker {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10, 18, 34, 0.92);
+  border: 1px solid rgba(96, 150, 210, 0.4);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 12.5px;
+  color: var(--text);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+  z-index: 4;
+}
+#ticker.show { opacity: 1; }
+
+/* ---------- 结算：提前关闭提示 ---------- */
+.shutdown-line {
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.shutdown-line.hidden { display: none; }

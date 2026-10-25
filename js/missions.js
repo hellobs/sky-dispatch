@@ -20,9 +20,21 @@
       this.id = SD.uid();
       this.type = pickType();
       this.origin = SD.choice(C.PADS);
-      this.dest = airspace.randomFreeCell(this.origin, 8);
-      this.maxTtl = C.REQUEST_TTL;
-      this.ttl = C.REQUEST_TTL;
+      // 目的地优先选不在固定禁航航线上的；多次尝试后仍穿航则保留并标记
+      let dest = null, blocked = false;
+      for (let t = 0; t < 5; t++) {
+        dest = airspace.randomFreeCell(this.origin, 8);
+        blocked = airspace.pathHitsStatic(
+          this.origin.x + 0.5, this.origin.y + 0.5,
+          dest.x + 0.5, dest.y + 0.5,
+        );
+        if (!blocked) break;
+      }
+      this.dest = dest;
+      this.blocked = blocked;
+      // 救援窗口更短，逼你排优先级
+      this.maxTtl = this.type === 'rescue' ? C.RESCUE_TTL : C.REQUEST_TTL;
+      this.ttl = this.maxTtl;
       this.reward = C.SCORE[this.type];
     }
   }
@@ -35,6 +47,7 @@
       this.completed = 0;
       this.expired = 0;
       this.rejected = 0;
+      this.diverted = 0;
     }
     spawnInterval(elapsed) {
       return SD.lerp(C.SPAWN_START, C.SPAWN_END, SD.clamp(elapsed / C.ROUND_SECONDS, 0, 1));
@@ -66,4 +79,5 @@
   }
 
   SD.MissionBoard = MissionBoard;
+  SD.Request = Request; // 供测试注入
 })();
