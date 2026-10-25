@@ -30,7 +30,10 @@
     start() {
       this.airspace.reset();
       this.board = new SD.MissionBoard(this.airspace);
-      this.airspace.onTempSpawn = () => this.notify('⚠ 临时禁飞区即将生效，注意改线');
+      this.airspace.onTempSpawn = () => {
+        this.notify('⚠ 临时禁飞区即将生效，注意改线');
+        SD.audio.warn();
+      };
       this.airspace.onTempActive = (zone) => this.divertFlights(zone);
       this.drones = [];
       this.floats = [];
@@ -49,12 +52,14 @@
       this.shutdown = false;
       this.elapsed = 0;
       this.uiTimer = 0;
+      this.lastTickSec = null;
       this.state = 'running';
       this.ui.hideOverlays();
       this.ui.setPauseEnabled(true);
       this.ui.resetQueue();
       this.ui.syncQueue(this.board, this);
       this.updateHud();
+      SD.audio.start();
     }
 
     togglePause() {
@@ -70,12 +75,16 @@
     approveRequest(id) {
       if (this.state !== 'running') return;
       const req = this.board.approve(id);
-      if (req) this.drones.push(new SD.Drone(req));
+      if (req) {
+        this.drones.push(new SD.Drone(req));
+        SD.audio.approve();
+      }
     }
 
     rejectRequest(id) {
       if (this.state !== 'running') return;
       this.board.reject(id);
+      SD.audio.reject();
     }
 
     /* 单帧推进：大 dt 拆成小步物理模拟，状态结束后停止 */
@@ -102,6 +111,15 @@
         this.uiTimer = 0;
         this.ui.syncQueue(this.board, this);
       }
+      // 最后 10 秒滴答
+      if (this.state === 'running') {
+        const remain = C.ROUND_SECONDS - this.elapsed;
+        const s = Math.ceil(remain);
+        if (remain <= 10 && remain > 0 && s !== this.lastTickSec) {
+          this.lastTickSec = s;
+          SD.audio.tick();
+        }
+      }
       this.updateHud();
     }
 
@@ -117,6 +135,7 @@
         this.lives++;
         this.sinceIncident = 0;
         this.notify('🛡 安全盾恢复 +1');
+        SD.audio.shield();
       }
 
       // 临时禁飞区排程：间隔随对局推进越来越短
@@ -134,6 +153,7 @@
       if (idx > this.phaseIdx) {
         this.phaseIdx = idx;
         this.notify(`📈 空域流量升级 · ${C.PHASES[idx]}`);
+        SD.audio.phase();
       }
 
       this.board.maybeSpawn(dt, this.elapsed);
@@ -143,6 +163,7 @@
         this.multLevel = 1;
         this.score -= expired * C.PENALTY.expire;
         this.addFloat(C.GRID / 2, 2.5, `-${expired * C.PENALTY.expire} 逾期`, '#ffb545');
+        SD.audio.expire();
       }
 
       // 飞行推进与到达结算
@@ -211,6 +232,7 @@
       const gained = C.SCORE[d.type] * mult;
       this.score += gained;
       this.addFloat(d.x, d.y, `+${gained}${mult > 1 ? ' ×' + mult : ''}`, SD.TYPE_STYLE[d.type].color);
+      SD.audio.deliver(mult);
     }
 
     /* 一起安全事故：清连击、扣安全盾，盾尽塔台关闭 */
@@ -226,6 +248,7 @@
       this.score -= penalty;
       this.addFloat(x, y, `-${penalty} ${info.text}`, info.color);
       this.notify(`✖ ${info.text}事故，安全盾 ${Math.max(0, this.lives)}/${C.LIVES}`);
+      SD.audio.crash();
       if (this.lives <= 0) {
         this.shutdown = true;
         this.end();
@@ -289,6 +312,7 @@
       this.ui.setPauseEnabled(false);
       this.updateHud();
       this.ui.showReport(this.stats());
+      SD.audio.over(this.shutdown);
     }
 
     updateHud() {

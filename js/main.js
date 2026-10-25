@@ -5,14 +5,24 @@
   const game = new SD.Game(canvas, ui);
   SD.ui = ui; // 调试探针
 
-  // 高分屏适配
+  // 高分屏适配（CSS 负责显示尺寸，移动端等比缩放）
   const dpr = window.devicePixelRatio || 1;
   const S = SD.CONFIG.GRID * SD.CONFIG.CELL;
   canvas.width = S * dpr;
   canvas.height = S * dpr;
-  canvas.style.width = S + 'px';
-  canvas.style.height = S + 'px';
   game.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  // 音效开关
+  const soundBtn = document.getElementById('btn-sound');
+  const syncSound = () => { soundBtn.textContent = SD.audio.isMuted() ? '🔇' : '🔊'; };
+  syncSound();
+  soundBtn.addEventListener('click', (e) => {
+    SD.audio.setMuted(!SD.audio.isMuted());
+    syncSound();
+    e.currentTarget.blur();
+  });
+  // 浏览器要求首次用户交互后才能出声
+  window.addEventListener('pointerdown', () => SD.audio.unlock(), { once: true });
 
   document.getElementById('btn-start').addEventListener('click', (e) => {
     game.start();
