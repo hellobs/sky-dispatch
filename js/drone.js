@@ -19,6 +19,8 @@
       this.type = req.type;
       this.x = req.origin.x + 0.5;
       this.y = req.origin.y + 0.5;
+      this.ox = this.x; // 起飞点（保护区中心）
+      this.oy = this.y;
       this.tx = req.dest.x + 0.5;
       this.ty = req.dest.y + 0.5;
       this.speed = C.DRONE_SPEED * (req.type === 'rescue' ? C.RESCUE_SPEED_MULT : 1);
@@ -28,6 +30,10 @@
       this.deadTimer = 0;
       this.diverting = false; // 空域管制备降中
       this.trail = [];
+    }
+    /* 是否处于自身起降保护区（起飞/降落阶段不受威胁判定） */
+    withinGrace() {
+      return SD.dist(this.x, this.y, this.ox, this.oy) < C.TAKEOFF_GRACE;
     }
     /* 空域管制：改飞最近的起降点备降 */
     divert(tx, ty) {

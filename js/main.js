@@ -24,6 +24,14 @@
   // 浏览器要求首次用户交互后才能出声
   window.addEventListener('pointerdown', () => SD.audio.unlock(), { once: true });
 
+  // 画布显示尺寸变小时，同步放大标注文字，保证手机端可读
+  const syncViewScale = () => {
+    const cssW = canvas.getBoundingClientRect().width || S;
+    SD.textScale = SD.clamp(S / cssW, 1, 2.2);
+  };
+  syncViewScale();
+  window.addEventListener('resize', syncViewScale);
+
   document.getElementById('btn-start').addEventListener('click', (e) => {
     game.start();
     e.currentTarget.blur();

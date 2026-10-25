@@ -1,6 +1,7 @@
 /* SkyDispatch · 全局数值配置（调平衡只改这里） */
 (function () {
   window.SD = window.SD || {};
+  SD.textScale = 1; // 画布标注缩放系数，main.js 按实际显示宽度动态更新
   SD.CONFIG = {
     GRID: 32,            // 32×32 = 1024 格低空空域
     CELL: 22,            // 每格像素
@@ -17,6 +18,7 @@
     DRONE_SPEED: 2.2,    // 无人机速度（格/秒）
     RESCUE_SPEED_MULT: 1.5,
     COLLIDE_DIST: 0.85,  // 空中冲突判定距离（格）
+    TAKEOFF_GRACE: 1.4,  // 起降保护区半径（自身起降点附近免受威胁/冲突）
     TRAIL_LEN: 14,       // 航迹点数
 
     SCORE: { delivery: 10, inspection: 15, rescue: 25 },

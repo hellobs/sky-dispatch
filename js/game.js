@@ -171,8 +171,8 @@
       for (const d of this.drones) {
         const landed = d.update(dt);
         if (landed) {
-          // 目标点可能已被风暴/禁飞区覆盖
-          if (this.airspace.inWeather(d.x, d.y) || this.airspace.inNoFly(d.x, d.y)) {
+          // 备降是管制强制行为，落地不判事故；正常到达若目标已被风暴/禁飞区覆盖则坠毁
+          if (!d.diverting && (this.airspace.inWeather(d.x, d.y) || this.airspace.inNoFly(d.x, d.y))) {
             d.kill(this.airspace.inWeather(d.x, d.y) ? 'weather' : 'zone');
             this.registerIncident(d.deathCause, d.x, d.y);
             kept.push(d);
@@ -186,21 +186,22 @@
       this.drones = kept;
       if (this.state !== 'running') return;
 
-      // 风暴与禁飞区
+      // 风暴与禁飞区（起降保护区内免疫）
       for (const d of this.drones) {
-        if (!d.alive) continue;
+        if (!d.alive || d.withinGrace()) continue;
         if (this.airspace.inWeather(d.x, d.y)) { d.kill('weather'); this.registerIncident('weather', d.x, d.y); }
         else if (this.airspace.inNoFly(d.x, d.y)) { d.kill('zone'); this.registerIncident('zone', d.x, d.y); }
         if (this.state !== 'running') return;
       }
 
-      // 空中冲突（两两判定，一次冲突记一起事故）
+      // 空中冲突（两两判定，一次冲突记一起事故；双方都在各自保护区内除外）
       for (let i = 0; i < this.drones.length; i++) {
         const a = this.drones[i];
         if (!a.alive) continue;
         for (let j = i + 1; j < this.drones.length; j++) {
           const b = this.drones[j];
           if (!b.alive) continue;
+          if (a.withinGrace() && b.withinGrace()) continue;
           if (SD.dist(a.x, a.y, b.x, b.y) < C.COLLIDE_DIST) {
             a.kill('crash');
             b.kill('crash');
@@ -261,7 +262,7 @@
       return 1;
     }
 
-    /* 临时禁飞区生效：路径会被覆盖的航班自动备降到最近起降点 */
+    /* 临时禁飞区生效：路径会被覆盖的航班自动备降到最近的「安全」起降点 */
     divertFlights(zone) {
       this.notify('⚠ 临时禁飞区已生效，受影响航班自动备降');
       for (const d of this.drones) {
@@ -269,14 +270,24 @@
         const inside = SD.dist(d.x, d.y, zone.x, zone.y) < zone.r;
         const willCross = this.airspace.pathHitsCircle(d.x, d.y, d.tx, d.ty, zone.x, zone.y, zone.r);
         if (!inside && !willCross) continue;
-        let best = C.PADS[0], bd = Infinity;
-        for (const p of C.PADS) {
-          const dd = SD.dist(d.x, d.y, p.x + 0.5, p.y + 0.5);
-          if (dd < bd) { bd = dd; best = p; }
-        }
-        d.divert(best.x + 0.5, best.y + 0.5);
+        d.divert(...this.nearestSafePad(d.x, d.y));
         this.addFloat(d.x, d.y, '备降', '#b8c9dc');
       }
+    }
+
+    /* 优先无风暴/无管制的起降点，全被覆盖时退回最近 */
+    nearestSafePad(x, y) {
+      let safe = null, safeD = Infinity;
+      let any = null, anyD = Infinity;
+      for (const p of C.PADS) {
+        const px = p.x + 0.5, py = p.y + 0.5;
+        const dd = SD.dist(x, y, px, py);
+        if (dd < anyD) { anyD = dd; any = [px, py]; }
+        if (dd < safeD && !this.airspace.inWeather(px, py) && !this.airspace.inNoFly(px, py)) {
+          safeD = dd; safe = [px, py];
+        }
+      }
+      return safe || any;
     }
 
     addFloat(x, y, text, color) {
@@ -342,7 +353,7 @@
         ctx.save();
         ctx.globalAlpha = SD.clamp(1 - f.t / 1.2, 0, 1);
         ctx.fillStyle = f.color;
-        ctx.font = 'bold 12px Consolas, monospace';
+        ctx.font = 'bold ' + Math.round(12 * (SD.textScale || 1)) + 'px Consolas, monospace';
         ctx.textAlign = 'center';
         ctx.fillText(f.text, f.x * C.CELL, f.y * C.CELL);
         ctx.restore();

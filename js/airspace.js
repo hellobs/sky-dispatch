@@ -7,8 +7,12 @@
   class WeatherBlob {
     constructor(speedMult) {
       this.r = SD.rand(1.8, 2.6);
-      this.x = SD.rand(this.r + 1, C.GRID - this.r - 1);
-      this.y = SD.rand(this.r + 1, C.GRID - this.r - 1);
+      // 初始位置避开起降点，避免开局即压坪
+      for (let i = 0; i < 20; i++) {
+        this.x = SD.rand(this.r + 1, C.GRID - this.r - 1);
+        this.y = SD.rand(this.r + 1, C.GRID - this.r - 1);
+        if (!C.PADS.some((p) => SD.dist(this.x, this.y, p.x, p.y) < this.r + 1.5)) break;
+      }
       const a = SD.rand(0, Math.PI * 2);
       const v = SD.rand(0.32, 0.5) * (speedMult || 1); // 越晚出现的风暴飘得越快
       this.vx = Math.cos(a) * v;
@@ -28,6 +32,7 @@
     contains(x, y) { return SD.dist(x, y, this.x, this.y) < this.r; }
     draw(ctx) {
       const px = this.x * C.CELL, py = this.y * C.CELL, pr = this.r * C.CELL;
+      const ts = SD.textScale || 1;
       const pulse = 0.16 + 0.05 * Math.sin(this.t * 1.6);
       ctx.save();
       ctx.fillStyle = '#7f9bb9';
@@ -39,9 +44,9 @@
       ctx.fill();
       ctx.globalAlpha = 0.85;
       ctx.fillStyle = '#b8c9dc';
-      ctx.font = '10px Consolas, monospace';
+      ctx.font = Math.round(10 * ts) + 'px Consolas, monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('风暴', px, py - pr - 4);
+      ctx.fillText('风暴', px, py - pr - 4 * ts);
       ctx.restore();
     }
   }
@@ -131,6 +136,7 @@
     }
     drawBase(ctx) {
       const N = C.GRID, S = N * C.CELL;
+      const ts = SD.textScale || 1;
       ctx.fillStyle = '#0a1120';
       ctx.fillRect(0, 0, S, S);
       // 雷达扫描余辉
@@ -171,10 +177,10 @@
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('H', px, py + 0.5);
-        ctx.font = 'bold 10px Consolas, monospace';
+        ctx.font = 'bold ' + Math.round(10 * ts) + 'px Consolas, monospace';
         ctx.textBaseline = 'alphabetic';
         ctx.fillStyle = 'rgba(150,180,215,0.85)';
-        ctx.fillText('P' + (i + 1), px, py + C.CELL * 0.42 + 11);
+        ctx.fillText('P' + (i + 1), px, py + C.CELL * 0.42 + 11 * ts);
         ctx.restore();
       });
       // 固定禁飞区
@@ -184,6 +190,7 @@
       });
     }
     drawZoneBody(ctx, px, py, pr, label, rgb, fillA, lineA) {
+      const ts = SD.textScale || 1;
       ctx.save();
       ctx.beginPath(); ctx.arc(px, py, pr, 0, Math.PI * 2); ctx.clip();
       ctx.strokeStyle = rgb + fillA + ')';
@@ -201,12 +208,13 @@
       ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.arc(px, py, pr, 0, Math.PI * 2); ctx.stroke();
       ctx.fillStyle = rgb + '0.9)';
-      ctx.font = '10px Consolas, monospace';
+      ctx.font = Math.round(10 * ts) + 'px Consolas, monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(label, px, py - pr - 4);
+      ctx.fillText(label, px, py - pr - 4 * ts);
       ctx.restore();
     }
     drawTempZones(ctx) {
+      const ts = SD.textScale || 1;
       this.tempZones.forEach((z) => {
         const px = z.x * C.CELL, py = z.y * C.CELL, pr = z.r * C.CELL;
         if (z.phase === 'warn') {
@@ -220,9 +228,9 @@
           ctx.lineWidth = 1.5;
           ctx.beginPath(); ctx.arc(px, py, pr, 0, Math.PI * 2); ctx.stroke();
           ctx.fillStyle = 'rgba(255,181,69,0.95)';
-          ctx.font = 'bold 10px Consolas, monospace';
+          ctx.font = 'bold ' + Math.round(10 * ts) + 'px Consolas, monospace';
           ctx.textAlign = 'center';
-          ctx.fillText('临时禁飞 ' + Math.ceil(z.warn) + 's', px, py - pr - 4);
+          ctx.fillText('临时禁飞 ' + Math.ceil(z.warn) + 's', px, py - pr - 4 * ts);
           ctx.restore();
         } else {
           this.drawZoneBody(ctx, px, py, pr, '临时禁飞 ' + Math.ceil(z.life) + 's', 'rgba(255,84,112,', 0.28, 0.9);
