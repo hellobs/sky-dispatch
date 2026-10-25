@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyDispatch · 低空塔台</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div class="brand">SkyDispatch<span class="brand-sub">低空塔台</span></div>
+    <div id="hud">
+      <div class="hud-item"><span class="hud-label">剩余</span><span class="hud-val" id="hud-time">03:00</span></div>
+      <div class="hud-item"><span class="hud-label">得分</span><span class="hud-val accent" id="hud-score">0</span></div>
+      <div class="hud-item"><span class="hud-label">在空</span><span class="hud-val" id="hud-air">0</span></div>
+      <div class="hud-item"><span class="hud-label">完成</span><span class="hud-val" id="hud-done">0</span></div>
+      <div class="hud-item"><span class="hud-label">冲突</span><span class="hud-val danger" id="hud-crash">0</span></div>
+    </div>
+    <button id="btn-pause" class="btn ghost" disabled>暂停</button>
+  </header>
+
+  <main>
+    <div id="stage">
+      <canvas id="sky" width="704" height="704"></canvas>
+
+      <div id="overlay-menu" class="overlay">
+        <div class="overlay-card">
+          <h1>SkyDispatch</h1>
+          <p class="cn-title">低空塔台</p>
+          <p class="desc">
+            1024 格低空空域正在向你开放。<br>
+            审批不断涌入的飞行申请、放行无人机、<br>
+            避开禁飞区与移动风暴——<br>
+            撑满一局 3 分钟，看看你能调度多少架次。
+          </p>
+          <button id="btn-start" class="btn primary">开始调度</button>
+          <p class="hint">空格键暂停 · 鼠标悬停申请卡可在地图上预览航线</p>
+        </div>
+      </div>
+
+      <div id="overlay-pause" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>已暂停</h2>
+          <button id="btn-resume" class="btn primary">继续调度</button>
+        </div>
+      </div>
+
+      <div id="overlay-report" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>今日调度报告</h2>
+          <div class="report-score"><span id="report-score">0</span><span class="unit">分</span></div>
+          <div id="report-rows" class="report-rows"></div>
+          <div class="report-btns">
+            <button id="btn-restart" class="btn primary">再飞一局</button>
+            <button id="btn-share" class="btn ghost">复制战绩</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside id="panel">
+      <div class="panel-head">任务申请 <span id="queue-count" class="queue-count">0</span></div>
+      <div id="queue"></div>
+      <div id="legend">
+        <div class="legend-title">图例</div>
+        <div class="legend-row"><span class="dot d-delivery"></span>配送任务</div>
+        <div class="legend-row"><span class="dot d-inspection"></span>巡检任务</div>
+        <div class="legend-row"><span class="dot d-rescue"></span>救援任务</div>
+        <div class="legend-row"><span class="shape pad"></span>起降点</div>
+        <div class="legend-row"><span class="shape zone"></span>禁飞区（闯入扣分）</div>
+        <div class="legend-row"><span class="shape storm"></span>风暴（进入坠机）</div>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/config.js"></script>
+<script src="js/airspace.js"></script>
+<script src="js/drone.js"></script>
+<script src="js/missions.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/game.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
