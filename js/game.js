@@ -45,6 +45,7 @@
       this.comboBest = 0;
       this.multLevel = 1;
       this.tempTimer = C.TEMP_ZONE.FIRST;
+      this.phaseIdx = 0;
       this.shutdown = false;
       this.elapsed = 0;
       this.uiTimer = 0;
@@ -68,14 +69,8 @@
 
     approveRequest(id) {
       if (this.state !== 'running') return;
-      const req = this.board.requests.find((r) => r.id === id);
-      if (!req) return;
-      if (req.blocked) {
-        this.notify('⛔ 航线穿越固定禁飞区，不能批准');
-        return;
-      }
-      this.board.approve(id);
-      this.drones.push(new SD.Drone(req));
+      const req = this.board.approve(id);
+      if (req) this.drones.push(new SD.Drone(req));
     }
 
     rejectRequest(id) {
@@ -124,11 +119,21 @@
         this.notify('🛡 安全盾恢复 +1');
       }
 
-      // 临时禁飞区排程
+      // 临时禁飞区排程：间隔随对局推进越来越短
       this.tempTimer -= dt;
       if (this.tempTimer <= 0) {
         this.airspace.spawnTempZone();
-        this.tempTimer = SD.rand(C.TEMP_ZONE.GAP_MIN, C.TEMP_ZONE.GAP_MAX);
+        const t = SD.clamp(this.elapsed / C.ROUND_SECONDS, 0, 1);
+        const gap = SD.lerp(C.TEMP_ZONE.GAP_START, C.TEMP_ZONE.GAP_END, t);
+        this.tempTimer = gap * SD.rand(0.85, 1.15);
+      }
+
+      // 相位播报：每 45 秒空域流量升一级
+      const phaseLen = C.ROUND_SECONDS / C.PHASES.length;
+      const idx = Math.min(C.PHASES.length - 1, Math.floor(this.elapsed / phaseLen));
+      if (idx > this.phaseIdx) {
+        this.phaseIdx = idx;
+        this.notify(`📈 空域流量升级 · ${C.PHASES[idx]}`);
       }
 
       this.board.maybeSpawn(dt, this.elapsed);
@@ -338,7 +343,7 @@
         }
       }
       const col = hitsStatic ? '#ff5470' : hitsDynamic ? '#ffb545' : SD.TYPE_STYLE[r.type].color;
-      const label = hitsStatic ? '⛔ 禁航' : hitsDynamic ? '⚠ 有风险' : '';
+      const label = hitsStatic ? '⚠ 穿越禁飞区' : hitsDynamic ? '⚠ 有风险' : '';
       ctx.save();
       ctx.setLineDash([6, 5]);
       ctx.strokeStyle = col;

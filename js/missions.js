@@ -16,24 +16,26 @@
   }
 
   class Request {
-    constructor(airspace) {
+    constructor(airspace, elapsed) {
       this.id = SD.uid();
       this.type = pickType();
       this.origin = SD.choice(C.PADS);
       // 目的地优先选不在固定禁航航线上的；多次尝试后仍穿航则保留并标记
-      let dest = null, blocked = false;
+      let dest = null, risky = false;
       for (let t = 0; t < 5; t++) {
         dest = airspace.randomFreeCell(this.origin, 8);
-        blocked = airspace.pathHitsStatic(
+        risky = airspace.pathHitsStatic(
           this.origin.x + 0.5, this.origin.y + 0.5,
           dest.x + 0.5, dest.y + 0.5,
         );
-        if (!blocked) break;
+        if (!risky) break;
       }
       this.dest = dest;
-      this.blocked = blocked;
-      // 救援窗口更短，逼你排优先级
-      this.maxTtl = this.type === 'rescue' ? C.RESCUE_TTL : C.REQUEST_TTL;
+      this.risky = risky;
+      // 有效期随对局推进缩短；救援窗口更短，逼你排优先级
+      const t = SD.clamp((elapsed || 0) / C.ROUND_SECONDS, 0, 1);
+      const baseTtl = SD.lerp(C.REQUEST_TTL, C.TTL_END, Math.pow(t, C.SPAWN_CURVE));
+      this.maxTtl = this.type === 'rescue' ? Math.min(C.RESCUE_TTL, baseTtl) : baseTtl;
       this.ttl = this.maxTtl;
       this.reward = C.SCORE[this.type];
     }
@@ -50,12 +52,13 @@
       this.diverted = 0;
     }
     spawnInterval(elapsed) {
-      return SD.lerp(C.SPAWN_START, C.SPAWN_END, SD.clamp(elapsed / C.ROUND_SECONDS, 0, 1));
+      const t = SD.clamp(elapsed / C.ROUND_SECONDS, 0, 1);
+      return SD.lerp(C.SPAWN_START, C.SPAWN_END, Math.pow(t, C.SPAWN_CURVE));
     }
     maybeSpawn(dt, elapsed) {
       this.spawnTimer -= dt;
       if (this.spawnTimer > 0) return;
-      if (this.requests.length < C.MAX_PENDING) this.requests.push(new Request(this.airspace));
+      if (this.requests.length < C.MAX_PENDING) this.requests.push(new Request(this.airspace, elapsed));
       this.spawnTimer = this.spawnInterval(elapsed);
     }
     /* 返回本帧逾期的申请数 */

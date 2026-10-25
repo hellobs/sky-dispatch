@@ -5,12 +5,12 @@
   const C = SD.CONFIG;
 
   class WeatherBlob {
-    constructor() {
+    constructor(speedMult) {
       this.r = SD.rand(1.8, 2.6);
       this.x = SD.rand(this.r + 1, C.GRID - this.r - 1);
       this.y = SD.rand(this.r + 1, C.GRID - this.r - 1);
       const a = SD.rand(0, Math.PI * 2);
-      const v = SD.rand(0.32, 0.5);
+      const v = SD.rand(0.32, 0.5) * (speedMult || 1); // 越晚出现的风暴飘得越快
       this.vx = Math.cos(a) * v;
       this.vy = Math.sin(a) * v;
       this.t = 0;
@@ -62,7 +62,7 @@
       C.WEATHER_AT.forEach((at, i) => {
         if (!this.weatherFlags[i] && elapsed >= at) {
           this.weatherFlags[i] = true;
-          this.weather.push(new WeatherBlob());
+          this.weather.push(new WeatherBlob(1 + 0.7 * (at / C.ROUND_SECONDS)));
         }
       });
       for (let i = this.tempZones.length - 1; i >= 0; i--) {
