@@ -18,3 +18,7 @@ desktop.ini
 # Logs
 *.log
 npm-debug.log*
+
+# WorkBuddy local tooling state（含本机路径/应用ID/会话记忆，勿入库）
+.workbuddy/
+.wbapp_*.genie
