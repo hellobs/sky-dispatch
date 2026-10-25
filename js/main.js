@@ -34,13 +34,18 @@
 
   // 主菜单展示历史最佳
   ui.updateBest(SD.best.get());
+  document.getElementById('btn-daily').textContent = `每日挑战 · ${SD.dailyLabel()}`;
 
   document.getElementById('btn-start').addEventListener('click', (e) => {
-    game.start();
+    game.start(null); // 自由调度：随机空域
+    e.currentTarget.blur();
+  });
+  document.getElementById('btn-daily').addEventListener('click', (e) => {
+    game.start(SD.dailySeed()); // 每日挑战：固定种子，全网同题
     e.currentTarget.blur();
   });
   document.getElementById('btn-restart').addEventListener('click', (e) => {
-    game.start();
+    game.start(); // 沿用上一局模式
     e.currentTarget.blur();
   });
   document.getElementById('btn-resume').addEventListener('click', (e) => {
@@ -58,7 +63,8 @@
 
   document.getElementById('btn-share').addEventListener('click', (e) => {
     const s = game.stats();
-    const text = `我在 #SkyDispatch 低空塔台 完成一局低空调度：总分 ${s.score}，完成 ${s.completed} 单，最高 ${s.comboBest} 连击，准点率 ${s.onTime}%。1024 格低空空域，等你来接管塔台。`;
+    const mode = game.dailySeed ? `每日挑战（${game.dailyDate}）` : '自由调度';
+    const text = `我在 #SkyDispatch 低空塔台 的${mode}中拿到 ${s.score} 分：完成 ${s.completed} 单，最高 ${s.comboBest} 连击，准点率 ${s.onTime}%。1024 格低空空域，等你来接管塔台。`;
     const btn = e.currentTarget;
     const done = () => {
       btn.textContent = '已复制 ✓';

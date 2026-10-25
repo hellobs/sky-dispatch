@@ -60,7 +60,9 @@
       this.setPauseLabel(true);
     }
     showReport(st) {
-      this.el.reportTitle.textContent = st.shutdown ? '塔台已关闭' : '今日调度报告';
+      this.el.reportTitle.textContent = st.shutdown
+        ? '塔台已关闭'
+        : st.daily ? '每日挑战 · 调度报告' : '今日调度报告';
       this.el.shutdownLine.classList.toggle('hidden', !st.shutdown);
       this.el.recordLine.classList.toggle('hidden', !st.newRecord);
       this.el.reportScore.textContent = st.score;

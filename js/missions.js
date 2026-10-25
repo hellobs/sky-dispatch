@@ -10,7 +10,7 @@
     { type: 'rescue', w: 15 },
   ];
   function pickType() {
-    let r = Math.random() * TYPE_POOL.reduce((s, t) => s + t.w, 0);
+    let r = SD.rand(0, TYPE_POOL.reduce((s, t) => s + t.w, 0));
     for (const t of TYPE_POOL) if ((r -= t.w) < 0) return t.type;
     return 'delivery';
   }

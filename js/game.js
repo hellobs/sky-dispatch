@@ -27,7 +27,17 @@
       this.lastTs = null;
     }
 
-    start() {
+    /* seed 传 null = 自由调度（随机）；不传 = 沿用当前模式（重开/放弃保持一致） */
+    start(seed) {
+      if (seed === undefined) seed = this.dailySeed;
+      this.dailySeed = seed || null;
+      this.dailyDate = null;
+      if (this.dailySeed) {
+        SD.setRng(this.dailySeed);
+        this.dailyDate = SD.dailyLabel();
+      } else {
+        SD.clearRng();
+      }
       this.airspace.reset();
       this.board = new SD.MissionBoard(this.airspace);
       this.airspace.onTempSpawn = () => {
@@ -316,6 +326,8 @@
         shutdown: this.shutdown,
         newRecord: this.newRecord,
         prevBest: this.prevBest,
+        daily: !!this.dailySeed,
+        dailyDate: this.dailyDate,
       };
     }
 
