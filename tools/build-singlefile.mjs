@@ -9,7 +9,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 const html = await readFile(join(root, "index.html"), "utf8");
 const css = await readFile(join(root, "css", "style.css"), "utf8");
-const scripts = ["utils", "config", "airspace", "drone", "missions", "ui", "game", "main"];
+const scripts = ["utils", "config", "airspace", "drone", "missions", "ui", "audio", "game", "main"];
 
 // 用替换函数返回，避免 JS 源码中的 $ 序列被当作替换模式
 let out = html.replace(
